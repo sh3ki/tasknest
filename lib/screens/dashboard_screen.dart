@@ -3,6 +3,7 @@ import 'package:fl_chart/fl_chart.dart';
 import '../data/task_data.dart';
 import '../models/task_model.dart';
 import '../theme/app_theme.dart';
+import '../utils/profile_avatar_provider.dart';
 import '../widgets/task_card.dart';
 import '../widgets/stat_card.dart';
 import 'add_task_screen.dart';
@@ -51,14 +52,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
               // Header
               Row(
                 children: [
-                  Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: AppTheme.primary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      ProfileAvatarProvider.imageUrl,
+                      width: 42,
+                      height: 42,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        width: 42,
+                        height: 42,
+                        color: AppTheme.primary.withOpacity(0.1),
+                        alignment: Alignment.center,
+                        child: const Text('AJ', style: TextStyle(color: AppTheme.primary, fontSize: 15, fontWeight: FontWeight.w700)),
+                      ),
                     ),
-                    child: const Center(child: Text('AJ', style: TextStyle(color: AppTheme.primary, fontSize: 15, fontWeight: FontWeight.w700))),
                   ),
                   const SizedBox(width: 12),
                   Column(
@@ -85,7 +93,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
-                childAspectRatio: 1.6,
+                childAspectRatio: 1.45,
                 children: [
                   StatCard(icon: Icons.assignment_rounded, label: 'Total Tasks', value: '$_totalTasks', color: AppTheme.secondary),
                   StatCard(icon: Icons.check_circle_rounded, label: 'Completed', value: '$_completedCount', color: AppTheme.success),
