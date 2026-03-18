@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
-import '../data/mock_data.dart';
+import '../data/task_data.dart';
 import '../models/task_model.dart';
 import '../theme/app_theme.dart';
 import '../widgets/task_card.dart';
@@ -15,327 +14,133 @@ class CalendarScreen extends StatefulWidget {
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
-  DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay = DateTime.now();
-  CalendarFormat _calendarFormat = CalendarFormat.month;
+  late DateTime _selectedDate;
+  late DateTime _focusedMonth;
 
-  List<Task> _getTasksForDay(DateTime day) {
-    return MockData.tasks
-        .where((t) =>
-            t.dueDate.year == day.year &&
-            t.dueDate.month == day.month &&
-            t.dueDate.day == day.day)
-        .toList();
+  @override
+  void initState() {
+    super.initState();
+    _selectedDate = DateTime.now();
+    _focusedMonth = DateTime(_selectedDate.year, _selectedDate.month);
   }
 
-  List<Task> get _selectedTasks {
-    if (_selectedDay == null) return [];
-    return _getTasksForDay(_selectedDay!);
+  List<Task> get _tasksForDate {
+    return TaskData.tasks.where((t) =>
+      t.dueDate.year == _selectedDate.year &&
+      t.dueDate.month == _selectedDate.month &&
+      t.dueDate.day == _selectedDate.day
+    ).toList();
   }
 
-  TaskCategory? _categoryFor(Task task) {
-    try {
-      return MockData.categories.firstWhere((c) => c.id == task.categoryId);
-    } catch (_) {
-      return null;
-    }
+  bool _hasTasksOn(DateTime date) {
+    return TaskData.tasks.any((t) => t.dueDate.year == date.year && t.dueDate.month == date.month && t.dueDate.day == date.day);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.surface,
-      body: SafeArea(
+    final daysInMonth = DateUtils.getDaysInMonth(_focusedMonth.year, _focusedMonth.month);
+    final firstWeekday = DateTime(_focusedMonth.year, _focusedMonth.month, 1).weekday % 7;
+    final today = DateTime.now();
+
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: Row(
+            const Text('Calendar', style: TextStyle(color: AppTheme.textPrimary, fontSize: 20, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 20),
+
+            // Month nav
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(color: AppTheme.cardBg, borderRadius: BorderRadius.circular(16), boxShadow: AppTheme.cardShadow),
+              child: Column(
                 children: [
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Calendar',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 26,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.textPrimary,
-                        ),
+                      IconButton(
+                        icon: const Icon(Icons.chevron_left_rounded, color: AppTheme.textSecondary),
+                        onPressed: () => setState(() => _focusedMonth = DateTime(_focusedMonth.year, _focusedMonth.month - 1)),
                       ),
-                      Text(
-                        'View tasks by date',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 13,
-                          color: AppTheme.textSecondary,
-                        ),
+                      Text(DateFormat('MMMM yyyy').format(_focusedMonth), style: const TextStyle(color: AppTheme.textPrimary, fontSize: 16, fontWeight: FontWeight.w600)),
+                      IconButton(
+                        icon: const Icon(Icons.chevron_right_rounded, color: AppTheme.textSecondary),
+                        onPressed: () => setState(() => _focusedMonth = DateTime(_focusedMonth.year, _focusedMonth.month + 1)),
                       ),
                     ],
                   ),
-                  const Spacer(),
-                  // Format toggle
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppTheme.primary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      children: [
-                        _FormatButton(
-                          label: 'Month',
-                          isSelected:
-                              _calendarFormat == CalendarFormat.month,
-                          onTap: () => setState(() =>
-                              _calendarFormat = CalendarFormat.month),
+                  const SizedBox(height: 8),
+                  // Weekday headers
+                  Row(
+                    children: ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d) =>
+                      Expanded(child: Center(child: Text(d, style: const TextStyle(color: AppTheme.textSecondary, fontSize: 11, fontWeight: FontWeight.w600)))),
+                    ).toList(),
+                  ),
+                  const SizedBox(height: 8),
+                  // Calendar grid
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 7, mainAxisSpacing: 4, crossAxisSpacing: 4),
+                    itemCount: firstWeekday + daysInMonth,
+                    itemBuilder: (context, index) {
+                      if (index < firstWeekday) return const SizedBox.shrink();
+                      final day = index - firstWeekday + 1;
+                      final date = DateTime(_focusedMonth.year, _focusedMonth.month, day);
+                      final isSelected = date.year == _selectedDate.year && date.month == _selectedDate.month && date.day == _selectedDate.day;
+                      final isToday = date.year == today.year && date.month == today.month && date.day == today.day;
+                      final hasTasks = _hasTasksOn(date);
+
+                      return GestureDetector(
+                        onTap: () => setState(() => _selectedDate = date),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: isSelected ? AppTheme.primary : isToday ? AppTheme.primary.withOpacity(0.08) : Colors.transparent,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('$day', style: TextStyle(color: isSelected ? Colors.white : AppTheme.textPrimary, fontSize: 13, fontWeight: isToday ? FontWeight.w700 : FontWeight.w500)),
+                              if (hasTasks) Container(width: 4, height: 4, margin: const EdgeInsets.only(top: 2), decoration: BoxDecoration(color: isSelected ? Colors.white : AppTheme.accent, shape: BoxShape.circle)),
+                            ],
+                          ),
                         ),
-                        _FormatButton(
-                          label: 'Week',
-                          isSelected:
-                              _calendarFormat == CalendarFormat.week,
-                          onTap: () => setState(() =>
-                              _calendarFormat = CalendarFormat.week),
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
                 ],
               ),
             ),
+            const SizedBox(height: 20),
 
+            // Tasks for selected date
+            Text(DateFormat('EEEE, MMMM d').format(_selectedDate), style: const TextStyle(color: AppTheme.textPrimary, fontSize: 16, fontWeight: FontWeight.w600)),
             const SizedBox(height: 12),
-
-            // Calendar
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: AppTheme.cardBg,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppTheme.divider),
-              ),
-              child: TableCalendar<Task>(
-                firstDay: DateTime.utc(2024, 1, 1),
-                lastDay: DateTime.utc(2026, 12, 31),
-                focusedDay: _focusedDay,
-                calendarFormat: _calendarFormat,
-                selectedDayPredicate: (day) =>
-                    isSameDay(_selectedDay, day),
-                onDaySelected: (selectedDay, focusedDay) {
-                  setState(() {
-                    _selectedDay = selectedDay;
-                    _focusedDay = focusedDay;
-                  });
-                },
-                onFormatChanged: (format) =>
-                    setState(() => _calendarFormat = format),
-                onPageChanged: (focusedDay) =>
-                    setState(() => _focusedDay = focusedDay),
-                eventLoader: _getTasksForDay,
-                calendarStyle: CalendarStyle(
-                  outsideDaysVisible: false,
-                  selectedDecoration: const BoxDecoration(
-                    color: AppTheme.primary,
-                    shape: BoxShape.circle,
-                  ),
-                  todayDecoration: BoxDecoration(
-                    color: AppTheme.primary.withOpacity(0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  todayTextStyle: const TextStyle(
-                    color: AppTheme.primary,
-                    fontWeight: FontWeight.w700,
-                    fontFamily: 'Poppins',
-                  ),
-                  selectedTextStyle: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontFamily: 'Poppins',
-                  ),
-                  defaultTextStyle: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 13,
-                  ),
-                  weekendTextStyle: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 13,
-                    color: AppTheme.priorityHigh,
-                  ),
-                  markerDecoration: const BoxDecoration(
-                    color: AppTheme.secondary,
-                    shape: BoxShape.circle,
-                  ),
-                  markerSize: 5,
-                  markersMaxCount: 3,
+            if (_tasksForDate.isEmpty)
+              Container(
+                padding: const EdgeInsets.all(24),
+                alignment: Alignment.center,
+                child: Column(
+                  children: [
+                    Icon(Icons.event_available_rounded, color: AppTheme.textSecondary.withOpacity(0.3), size: 40),
+                    const SizedBox(height: 8),
+                    const Text('No tasks for this date', style: TextStyle(color: AppTheme.textSecondary, fontSize: 13)),
+                  ],
                 ),
-                headerStyle: const HeaderStyle(
-                  formatButtonVisible: false,
-                  titleCentered: true,
-                  titleTextStyle: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w600,
-                    fontSize: 15,
-                    color: AppTheme.textPrimary,
-                  ),
-                  leftChevronIcon: Icon(
-                    Icons.chevron_left_rounded,
-                    color: AppTheme.textPrimary,
-                  ),
-                  rightChevronIcon: Icon(
-                    Icons.chevron_right_rounded,
-                    color: AppTheme.textPrimary,
-                  ),
-                ),
-                daysOfWeekStyle: const DaysOfWeekStyle(
-                  weekdayStyle: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.textSecondary,
-                  ),
-                  weekendStyle: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.priorityHigh,
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Selected day tasks header
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  Text(
-                    _selectedDay != null
-                        ? DateFormat('EEEE, MMM d')
-                            .format(_selectedDay!)
-                        : 'Select a day',
-                    style: const TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  if (_selectedTasks.isNotEmpty)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        '${_selectedTasks.length} tasks',
-                        style: const TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.primary,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 10),
-
-            // Task list
-            Expanded(
-              child: _selectedTasks.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.event_available_rounded,
-                            size: 48,
-                            color: AppTheme.textSecondary
-                                .withOpacity(0.3),
-                          ),
-                          const SizedBox(height: 12),
-                          const Text(
-                            'No tasks on this day',
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 14,
-                              color: AppTheme.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : ListView.builder(
-                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                      itemCount: _selectedTasks.length,
-                      itemBuilder: (_, index) {
-                        final task = _selectedTasks[index];
-                        return TaskCard(
-                          task: task,
-                          category: _categoryFor(task),
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  TaskDetailScreen(task: task),
-                            ),
-                          ).then((_) => setState(() {})),
-                          onToggle: () => setState(() {
-                            task.status =
-                                task.status == TaskStatus.completed
-                                    ? TaskStatus.pending
-                                    : TaskStatus.completed;
-                          }),
-                        );
-                      },
-                    ),
-            ),
+              )
+            else
+              ..._tasksForDate.map((task) {
+                final cat = TaskData.categoryFor(task.categoryId);
+                return TaskCard(
+                  task: task,
+                  category: cat,
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => TaskDetailScreen(task: task, category: cat))),
+                );
+              }),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _FormatButton extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _FormatButton({
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            color:
-                isSelected ? Colors.white : AppTheme.textSecondary,
-          ),
         ),
       ),
     );
