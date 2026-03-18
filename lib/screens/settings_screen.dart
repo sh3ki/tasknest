@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../utils/profile_avatar_provider.dart';
 import '../widgets/app_logo.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -33,11 +34,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
               decoration: BoxDecoration(color: AppTheme.primary, borderRadius: BorderRadius.circular(16)),
               child: Row(
                 children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(14)),
-                    child: const Center(child: Text('AJ', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700))),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: Image.network(
+                      ProfileAvatarProvider.imageUrl,
+                      width: 48,
+                      height: 48,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(14)),
+                        child: const Center(child: Text('AJ', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700))),
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 14),
                   const Column(
