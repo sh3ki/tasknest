@@ -1,4 +1,4 @@
-package com.tasknest.app
+package com.portfolio.tasknest
 
 import io.flutter.embedding.android.FlutterActivity
 
