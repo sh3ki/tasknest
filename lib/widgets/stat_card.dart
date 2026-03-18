@@ -13,7 +13,7 @@ class StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = color ?? AppTheme.secondary;
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppTheme.cardBg,
         borderRadius: BorderRadius.circular(14),
@@ -30,10 +30,15 @@ class StatCard extends StatelessWidget {
             ),
             child: Icon(icon, color: c, size: 18),
           ),
-          const SizedBox(height: 10),
-          Text(value, style: const TextStyle(color: AppTheme.textPrimary, fontSize: 22, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 2),
-          Text(label, style: const TextStyle(color: AppTheme.textSecondary, fontSize: 11)),
+          const SizedBox(height: 8),
+          Text(value, style: const TextStyle(color: AppTheme.textPrimary, fontSize: 20, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 1),
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: AppTheme.textSecondary, fontSize: 11),
+          ),
         ],
       ),
     );
