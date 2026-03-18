@@ -11,257 +11,123 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _notifications = true;
-  bool _dailyReminder = true;
-  bool _soundEnabled = false;
   bool _darkMode = false;
-  bool _weekStartMonday = true;
-  String _defaultView = 'All Tasks';
+  bool _reminders = true;
   String _defaultPriority = 'Medium';
+  String _sortBy = 'Due Date';
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.surface,
-      body: SafeArea(
-        child: CustomScrollView(
-          physics: const BouncingScrollPhysics(),
-          slivers: [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Settings',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 26,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Settings', style: TextStyle(color: AppTheme.textPrimary, fontSize: 20, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 24),
 
-                    // Profile card
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [
-                            Color(0xFF3949AB),
-                            Color(0xFF5C6BC0),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 28,
-                            backgroundColor: Colors.white.withOpacity(0.2),
-                            child: const Text(
-                              'AJ',
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                                fontSize: 18,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Alex Johnson',
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  'alex.johnson@email.com',
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    color: Colors.white.withOpacity(0.8),
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 5),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Text(
-                              'Pro',
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+            // Profile
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(color: AppTheme.primary, borderRadius: BorderRadius.circular(16)),
+              child: Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(14)),
+                    child: const Center(child: Text('AJ', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700))),
+                  ),
+                  const SizedBox(width: 14),
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Alex Johnson', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                      Text('alex@taskmanager.io', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    ],
+                  ),
+                  const Spacer(),
+                  Icon(Icons.edit_rounded, color: Colors.white.withOpacity(0.6), size: 20),
+                ],
               ),
             ),
+            const SizedBox(height: 24),
 
-            SliverPadding(
-              padding: const EdgeInsets.all(20),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate([
-                  _SettingsSection(
-                    title: 'Notifications',
-                    children: [
-                      _ToggleSetting(
-                        icon: Icons.notifications_rounded,
-                        iconColor: AppTheme.primary,
-                        title: 'Push Notifications',
-                        subtitle: 'Get task reminders',
-                        value: _notifications,
-                        onChanged: (v) =>
-                            setState(() => _notifications = v),
-                      ),
-                      _ToggleSetting(
-                        icon: Icons.alarm_rounded,
-                        iconColor: const Color(0xFFFF9800),
-                        title: 'Daily Reminder',
-                        subtitle: 'Remind at 9:00 AM every day',
-                        value: _dailyReminder,
-                        onChanged: (v) =>
-                            setState(() => _dailyReminder = v),
-                      ),
-                      _ToggleSetting(
-                        icon: Icons.volume_up_rounded,
-                        iconColor: const Color(0xFF26C6DA),
-                        title: 'Sound & Vibration',
-                        subtitle: 'Notification sound',
-                        value: _soundEnabled,
-                        onChanged: (v) =>
-                            setState(() => _soundEnabled = v),
-                      ),
-                    ],
+            // App branding
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(color: AppTheme.cardBg, borderRadius: BorderRadius.circular(16), boxShadow: AppTheme.cardShadow),
+              child: Row(
+                children: [
+                  const AppLogo(size: 40, showText: true),
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(color: AppTheme.accent.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+                    child: const Text('v1.0', style: TextStyle(color: AppTheme.accent, fontSize: 12, fontWeight: FontWeight.w600)),
                   ),
-                  const SizedBox(height: 16),
-
-                  _SettingsSection(
-                    title: 'Appearance',
-                    children: [
-                      _ToggleSetting(
-                        icon: Icons.dark_mode_rounded,
-                        iconColor: const Color(0xFF5C6BC0),
-                        title: 'Dark Mode',
-                        subtitle: 'Enable dark theme',
-                        value: _darkMode,
-                        onChanged: (v) => setState(() => _darkMode = v),
-                      ),
-                      _SelectSetting(
-                        icon: Icons.view_list_rounded,
-                        iconColor: const Color(0xFFEC407A),
-                        title: 'Default View',
-                        selectedValue: _defaultView,
-                        options: const [
-                          'All Tasks',
-                          'Today\'s Tasks',
-                          'High Priority',
-                        ],
-                        onChanged: (v) =>
-                            setState(() => _defaultView = v),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  _SettingsSection(
-                    title: 'Tasks',
-                    children: [
-                      _SelectSetting(
-                        icon: Icons.flag_rounded,
-                        iconColor: AppTheme.priorityMedium,
-                        title: 'Default Priority',
-                        selectedValue: _defaultPriority,
-                        options: const ['High', 'Medium', 'Low'],
-                        onChanged: (v) =>
-                            setState(() => _defaultPriority = v),
-                      ),
-                      _ToggleSetting(
-                        icon: Icons.calendar_view_week_rounded,
-                        iconColor: const Color(0xFF66BB6A),
-                        title: 'Week starts on Monday',
-                        subtitle: 'Calendar week start day',
-                        value: _weekStartMonday,
-                        onChanged: (v) =>
-                            setState(() => _weekStartMonday = v),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  _SettingsSection(
-                    title: 'About',
-                    children: [
-                      _TapSetting(
-                        icon: Icons.info_rounded,
-                        iconColor: AppTheme.primary,
-                        title: 'About TaskNest',
-                        subtitle: 'Version 1.0.0',
-                        onTap: () {},
-                      ),
-                      _TapSetting(
-                        icon: Icons.star_rounded,
-                        iconColor: const Color(0xFFFFB300),
-                        title: 'Rate the App',
-                        subtitle: 'Share your feedback',
-                        onTap: () {},
-                      ),
-                      _TapSetting(
-                        icon: Icons.privacy_tip_rounded,
-                        iconColor: AppTheme.textSecondary,
-                        title: 'Privacy Policy',
-                        subtitle: '',
-                        onTap: () {},
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-
-                  // App logo
-                  Center(
-                    child: Column(
-                      children: [
-                        const AppLogo(size: 36),
-                        const SizedBox(height: 8),
-                        Text(
-                          '© 2025 TaskNest. All rights reserved.',
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 11,
-                            color: AppTheme.textSecondary
-                                .withOpacity(0.6),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                ]),
+                ],
               ),
             ),
+            const SizedBox(height: 24),
+
+            // Notifications
+            _SectionHeader(label: 'Notifications'),
+            const SizedBox(height: 12),
+            _SettingsCard(children: [
+              _ToggleSetting(icon: Icons.notifications_rounded, label: 'Push Notifications', value: _notifications, onChanged: (v) => setState(() => _notifications = v)),
+              const Divider(height: 1),
+              _ToggleSetting(icon: Icons.alarm_rounded, label: 'Task Reminders', value: _reminders, onChanged: (v) => setState(() => _reminders = v)),
+            ]),
+            const SizedBox(height: 24),
+
+            // Preferences
+            _SectionHeader(label: 'Preferences'),
+            const SizedBox(height: 12),
+            _SettingsCard(children: [
+              _ToggleSetting(icon: Icons.dark_mode_rounded, label: 'Dark Mode', value: _darkMode, onChanged: (v) => setState(() => _darkMode = v)),
+              const Divider(height: 1),
+              _SelectSetting(
+                icon: Icons.flag_rounded,
+                label: 'Default Priority',
+                value: _defaultPriority,
+                options: const ['High', 'Medium', 'Low'],
+                onChanged: (v) => setState(() => _defaultPriority = v),
+              ),
+              const Divider(height: 1),
+              _SelectSetting(
+                icon: Icons.sort_rounded,
+                label: 'Sort Tasks By',
+                value: _sortBy,
+                options: const ['Due Date', 'Priority', 'Category', 'Created'],
+                onChanged: (v) => setState(() => _sortBy = v),
+              ),
+            ]),
+            const SizedBox(height: 24),
+
+            // Data
+            _SectionHeader(label: 'Data'),
+            const SizedBox(height: 12),
+            _SettingsCard(children: [
+              _TapSetting(icon: Icons.cloud_upload_rounded, label: 'Backup Tasks', onTap: () {}),
+              const Divider(height: 1),
+              _TapSetting(icon: Icons.cloud_download_rounded, label: 'Restore Tasks', onTap: () {}),
+              const Divider(height: 1),
+              _TapSetting(icon: Icons.delete_sweep_rounded, label: 'Clear Completed', onTap: () {}, isDanger: true),
+            ]),
+            const SizedBox(height: 24),
+
+            // About
+            _SectionHeader(label: 'About'),
+            const SizedBox(height: 12),
+            _SettingsCard(children: [
+              _InfoRow(label: 'Version', value: '1.0.0'),
+              const Divider(height: 1),
+              _InfoRow(label: 'Build', value: '2024.1'),
+              const Divider(height: 1),
+              _TapSetting(icon: Icons.info_outline_rounded, label: 'Licenses', onTap: () {}),
+            ]),
           ],
         ),
       ),
@@ -269,116 +135,46 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 }
 
-class _SettingsSection extends StatelessWidget {
-  final String title;
-  final List<Widget> children;
-  const _SettingsSection({required this.title, required this.children});
+class _SectionHeader extends StatelessWidget {
+  final String label;
+  const _SectionHeader({required this.label});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 10, left: 4),
-          child: Text(
-            title.toUpperCase(),
-            style: const TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              color: AppTheme.textSecondary,
-              letterSpacing: 1.2,
-            ),
-          ),
-        ),
-        Container(
-          decoration: BoxDecoration(
-            color: AppTheme.cardBg,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppTheme.divider),
-          ),
-          child: Column(
-            children: children
-                .asMap()
-                .entries
-                .map((e) => Column(
-                      children: [
-                        e.value,
-                        if (e.key < children.length - 1)
-                          const Divider(
-                            height: 1,
-                            indent: 56,
-                            color: AppTheme.divider,
-                          ),
-                      ],
-                    ))
-                .toList(),
-          ),
-        ),
-      ],
+    return Text(label, style: const TextStyle(color: AppTheme.textPrimary, fontSize: 16, fontWeight: FontWeight.w600));
+  }
+}
+
+class _SettingsCard extends StatelessWidget {
+  final List<Widget> children;
+  const _SettingsCard({required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(color: AppTheme.cardBg, borderRadius: BorderRadius.circular(14), boxShadow: AppTheme.cardShadow),
+      child: Column(children: children),
     );
   }
 }
 
 class _ToggleSetting extends StatelessWidget {
   final IconData icon;
-  final Color iconColor;
-  final String title;
-  final String subtitle;
+  final String label;
   final bool value;
   final ValueChanged<bool> onChanged;
-
-  const _ToggleSetting({
-    required this.icon,
-    required this.iconColor,
-    required this.title,
-    required this.subtitle,
-    required this.value,
-    required this.onChanged,
-  });
+  const _ToggleSetting({required this.icon, required this.label, required this.value, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
       child: Row(
         children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, size: 18, color: iconColor),
-          ),
+          Icon(icon, color: AppTheme.textSecondary, size: 20),
           const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title,
-                    style: const TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: AppTheme.textPrimary)),
-                if (subtitle.isNotEmpty)
-                  Text(subtitle,
-                      style: const TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 11,
-                          color: AppTheme.textSecondary)),
-              ],
-            ),
-          ),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeColor: AppTheme.primary,
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ),
+          Expanded(child: Text(label, style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14))),
+          Switch(value: value, onChanged: onChanged, activeColor: AppTheme.primary),
         ],
       ),
     );
@@ -387,122 +183,48 @@ class _ToggleSetting extends StatelessWidget {
 
 class _SelectSetting extends StatelessWidget {
   final IconData icon;
-  final Color iconColor;
-  final String title;
-  final String selectedValue;
+  final String label;
+  final String value;
   final List<String> options;
   final ValueChanged<String> onChanged;
-
-  const _SelectSetting({
-    required this.icon,
-    required this.iconColor,
-    required this.title,
-    required this.selectedValue,
-    required this.options,
-    required this.onChanged,
-  });
+  const _SelectSetting({required this.icon, required this.label, required this.value, required this.options, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      child: Row(
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, size: 18, color: iconColor),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(title,
-                style: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: AppTheme.textPrimary)),
-          ),
-          GestureDetector(
-            onTap: () {
-              showModalBottomSheet(
-                context: context,
-                backgroundColor: AppTheme.cardBg,
-                shape: const RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(20)),
-                ),
-                builder: (_) => Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 12, horizontal: 16),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 36,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: AppTheme.divider,
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(title,
-                          style: const TextStyle(
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15)),
-                      const SizedBox(height: 12),
-                      ...options.map(
-                        (o) => ListTile(
-                          title: Text(o,
-                              style: const TextStyle(
-                                  fontFamily: 'Poppins')),
-                          trailing: o == selectedValue
-                              ? const Icon(Icons.check_circle_rounded,
-                                  color: AppTheme.primary)
-                              : null,
-                          onTap: () {
-                            onChanged(o);
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    selectedValue,
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: iconColor,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Icon(Icons.keyboard_arrow_down_rounded,
-                      size: 16, color: iconColor),
-                ],
-              ),
+    return GestureDetector(
+      onTap: () {
+        showModalBottomSheet(
+          context: context,
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+          builder: (_) => Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(label, style: const TextStyle(color: AppTheme.textPrimary, fontSize: 16, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 12),
+                ...options.map((o) => ListTile(
+                  title: Text(o),
+                  trailing: o == value ? const Icon(Icons.check_rounded, color: AppTheme.primary) : null,
+                  onTap: () { onChanged(o); Navigator.pop(context); },
+                )),
+              ],
             ),
           ),
-        ],
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        child: Row(
+          children: [
+            Icon(icon, color: AppTheme.textSecondary, size: 20),
+            const SizedBox(width: 12),
+            Expanded(child: Text(label, style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14))),
+            Text(value, style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13)),
+            const SizedBox(width: 4),
+            const Icon(Icons.chevron_right_rounded, color: AppTheme.textSecondary, size: 18),
+          ],
+        ),
       ),
     );
   }
@@ -510,61 +232,45 @@ class _SelectSetting extends StatelessWidget {
 
 class _TapSetting extends StatelessWidget {
   final IconData icon;
-  final Color iconColor;
-  final String title;
-  final String subtitle;
+  final String label;
   final VoidCallback onTap;
-
-  const _TapSetting({
-    required this.icon,
-    required this.iconColor,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
+  final bool isDanger;
+  const _TapSetting({required this.icon, required this.label, required this.onTap, this.isDanger = false});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      behavior: HitTestBehavior.opaque,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Row(
           children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, size: 18, color: iconColor),
-            ),
+            Icon(icon, color: isDanger ? AppTheme.danger : AppTheme.textSecondary, size: 20),
             const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title,
-                      style: const TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: AppTheme.textPrimary)),
-                  if (subtitle.isNotEmpty)
-                    Text(subtitle,
-                        style: const TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 11,
-                            color: AppTheme.textSecondary)),
-                ],
-              ),
-            ),
-            const Icon(Icons.chevron_right_rounded,
-                size: 20, color: AppTheme.textSecondary),
+            Expanded(child: Text(label, style: TextStyle(color: isDanger ? AppTheme.danger : AppTheme.textPrimary, fontSize: 14))),
+            Icon(Icons.chevron_right_rounded, color: isDanger ? AppTheme.danger.withOpacity(0.5) : AppTheme.textSecondary, size: 18),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  final String label;
+  final String value;
+  const _InfoRow({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13)),
+          Text(value, style: const TextStyle(color: AppTheme.textPrimary, fontSize: 13, fontWeight: FontWeight.w500)),
+        ],
       ),
     );
   }
